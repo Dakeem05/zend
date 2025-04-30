@@ -3,15 +3,15 @@ import Image from "next/image";
 import { useState } from "react";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 export default function Home() {
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAdmin] = useState(true);
 
   const [tab, setTab] = useState("migrate");
   const handleTabChange = (newTab: string) => {
     setTab(newTab);
   };
-  const handleAdminToggle = () => {
-    setIsAdmin((prev) => !prev);
-  };
+  // const handleAdminToggle = () => {
+  //   setIsAdmin((prev) => !prev);
+  // };
 
   const { isConnected, address } = useAppKitAccount();
   const { open } = useAppKit();
@@ -111,7 +111,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="flex flex-col gap-6">
-              <div className="border-b border-black pb-2">
+              <div className="border-b pb-2">
                 <h2 className="text-xl font-bold text-black">Fund</h2>
                 <label className="block text-gray-600 mb-2">
                   Enter the amount you want to fund
