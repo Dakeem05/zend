@@ -105,7 +105,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <button className="w-full bg-blue-900 text-white py-4 rounded-lg font-medium mt-6">
+              <button className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6">
                 {isConnected ? "Migrate" : "Connect Wallet"}
               </button>
             </div>
@@ -129,7 +129,7 @@ export default function Home() {
                     placeholder=""
                   />
                 </div>
-                <button className="w-full bg-blue-900 text-white py-4 rounded-lg font-medium mt-6">
+                <button className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6">
                   {isConnected ? "Fund" : "Connect Wallet"}
                 </button>
               </div>
@@ -151,7 +151,7 @@ export default function Home() {
                     placeholder=""
                   />
                 </div>
-                <button className="w-full bg-blue-900 text-white py-4 rounded-lg font-medium mt-6">
+                <button className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6">
                   {isConnected ? "Extend" : "Connect Wallet"}
                 </button>
               </div>
