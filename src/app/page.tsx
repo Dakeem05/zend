@@ -1,11 +1,16 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
-export default function Home() {
-  const [isAdmin] = useState(true);
+import { Loader } from "lucide-react";
+import { useMigrationContract } from "@/hooks/use-contract";
 
+export default function Home() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [fundAmount, setFundAmount] = useState<number | undefined>();
+  const [extendDays, setExtendDays] = useState<number | undefined>();
   const [tab, setTab] = useState("migrate");
+
   const handleTabChange = (newTab: string) => {
     setTab(newTab);
   };
@@ -15,6 +20,121 @@ export default function Home() {
 
   const { isConnected, address } = useAppKitAccount();
   const { open } = useAppKit();
+  const {
+    owner,
+    isReadingContracts,
+    isPending,
+    error,
+    remainingTime,
+    remainingTimeError,
+    writingError,
+    writeContract,
+  } = useMigrationContract();
+
+  useEffect(() => {
+    if (address && owner) {
+      setIsAdmin(address === owner);
+    }
+  }, [address, owner]);
+
+  const fundWallet = async () => {
+    const amount = fundAmount ? fundAmount * 10 ** 18 : 0;
+    if (amount == 0) return;
+    writeContract({
+      functionName: "fundNewTokens",
+      args: [amount],
+    });
+  };
+
+  const formatRemainingTime = (timestamp: number) => {
+    const days = Math.floor(timestamp / (24 * 60 * 60));
+    const hours = Math.floor((timestamp % (24 * 60 * 60)) / (60 * 60));
+    const minutes = Math.floor((timestamp % (60 * 60)) / 60);
+    const seconds = Math.floor(timestamp % 60);
+
+    return {
+      days,
+      hours,
+      minutes,
+      seconds,
+    };
+  };
+
+  const [countdown, setCountdown] = useState(
+    formatRemainingTime(Number(remainingTime) || 0)
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (
+          prev.days === 0 &&
+          prev.hours === 0 &&
+          prev.minutes === 0 &&
+          prev.seconds === 0
+        ) {
+          clearInterval(interval);
+          return prev;
+        }
+
+        let { days, hours, minutes, seconds } = prev;
+
+        if (seconds > 0) {
+          seconds -= 1;
+        } else {
+          seconds = 59;
+          if (minutes > 0) {
+            minutes -= 1;
+          } else {
+            minutes = 59;
+            if (hours > 0) {
+              hours -= 1;
+            } else {
+              hours = 23;
+              if (days > 0) {
+                days -= 1;
+              }
+            }
+          }
+        }
+
+        return { days, hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [remainingTime]);
+
+  useEffect(() => {
+    if (remainingTime !== undefined) {
+      setCountdown(formatRemainingTime(Number(remainingTime) || 0));
+    }
+  }, [remainingTime]);
+
+  const handleExtendDays = () => {
+    console.log("called");
+    writeContract({
+      functionName: "extendMigration",
+      args: [extendDays],
+    });
+  };
+
+  const handleMigrate = () => {
+    console.log("called migrate");
+    writeContract({
+      functionName: "migrate",
+    });
+  };
+  console.log(
+    "looking for me?",
+    isReadingContracts,
+    formatRemainingTime(Number(remainingTime)),
+    remainingTime,
+    remainingTimeError,
+    owner,
+    countdown
+  );
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-white to-slate-50">
       <header className=" bg-[#5631AD] w-full px-4 py-4 flex justify-between items-center">
@@ -43,7 +163,7 @@ export default function Home() {
       </header>
 
       <main className="container mx-auto px-4 py-12 flex justify-center">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 w-full max-w-xl">
+        <div className="bg-white  min-h-[150px]  rounded-lg shadow-sm border border-gray-100 p-8 w-full max-w-xl">
           {isAdmin && (
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div
@@ -52,7 +172,7 @@ export default function Home() {
               >
                 <div
                   className={`border border-gray-200 text-gray-700 p-4 rounded-lg ${
-                    tab === "migrate" ? "bg-blue-900 text-white" : ""
+                    tab === "migrate" ? "bg-black text-white" : ""
                   }`}
                 >
                   <span className="block text-center">Migrate</span>
@@ -64,16 +184,20 @@ export default function Home() {
               >
                 <div
                   className={`border border-gray-200 text-gray-700 p-4 rounded-lg ${
-                    tab === "fund" ? "bg-blue-900 text-white" : ""
+                    tab === "fund" ? "bg-black text-white" : ""
                   }`}
                 >
-                  <span className="block text-center">Fund</span>
+                  <span className="block text-center">Admin</span>
                 </div>
               </div>
             </div>
           )}
 
-          {tab == "migrate" ? (
+          {isReadingContracts ? (
+            <div className="w-full h-full flex justify-center items-center">
+              <Loader className="w-5 h-5 animate-spin text-black" />
+            </div>
+          ) : tab == "migrate" ? (
             <div className="space-y-6">
               {/* <div>
               <label className="block text-gray-600 mb-2">
@@ -86,26 +210,31 @@ export default function Home() {
               />
             </div> */}
 
-              <div>
-                <label className="block text-gray-600 mb-2">
-                  Enter the amount you want to migrate.
-                </label>
-                <div className="flex items-center border border-gray-200 rounded-lg p-3">
-                  <div className="flex items-center">
-                    <div className="h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center mr-2">
-                      <span className="text-white text-xs">$</span>
-                    </div>
-                    {/* <span className="font-medium">Base USDC</span> */}
-                  </div>
-                  <input
-                    type="text"
-                    className="flex-1 outline-none "
-                    placeholder=""
-                  />
-                </div>
+              <div className="flex justify-center w-full">
+                <p className="text-black text-md">
+                  <span className="text-2xl">
+                    {countdown.days.toString().padStart(2, "0")}
+                  </span>
+                  d{" "}
+                  <span className="text-2xl">
+                    {countdown.hours.toString().padStart(2, "0")}
+                  </span>
+                  h{" "}
+                  <span className="text-2xl">
+                    {countdown.minutes.toString().padStart(2, "0")}
+                  </span>
+                  m{" "}
+                  <span className="text-2xl">
+                    {countdown.seconds.toString().padStart(2, "0")}
+                  </span>
+                  s
+                </p>
               </div>
 
-              <button className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6">
+              <button
+                onClick={isConnected ? () => handleMigrate() : () => open()}
+                className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
+              >
                 {isConnected ? "Migrate" : "Connect Wallet"}
               </button>
             </div>
@@ -124,13 +253,22 @@ export default function Home() {
                     {/* <span className="font-medium">Base USDC</span> */}
                   </div>
                   <input
-                    type="text"
+                    type="number"
+                    value={fundAmount}
+                    onChange={(e) => setFundAmount(Number(e.target.value))}
                     className="flex-1 outline-none "
                     placeholder=""
                   />
                 </div>
-                <button className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6">
-                  {isConnected ? "Fund" : "Connect Wallet"}
+                <button
+                  onClick={fundWallet}
+                  className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
+                >
+                  {isPending
+                    ? "Pending"
+                    : isConnected
+                    ? "Fund"
+                    : "Connect Wallet"}
                 </button>
               </div>
               <div className="">
@@ -146,13 +284,22 @@ export default function Home() {
                     {/* <span className="font-medium">Base USDC</span> */}
                   </div>
                   <input
+                    value={extendDays}
+                    onChange={(e) => setExtendDays(Number(e.target.value))}
                     type="text"
                     className="flex-1 outline-none "
                     placeholder=""
                   />
                 </div>
-                <button className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6">
-                  {isConnected ? "Extend" : "Connect Wallet"}
+                <button
+                  onClick={handleExtendDays}
+                  className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
+                >
+                  {isPending
+                    ? "Pending"
+                    : isConnected
+                    ? "Extend"
+                    : "Connect Wallet"}
                 </button>
               </div>
             </div>
