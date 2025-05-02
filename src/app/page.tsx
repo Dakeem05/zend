@@ -208,8 +208,8 @@ export default function Home() {
               />
             </div> */}
 
- <h2 className="text-xl font-semibold">Migration</h2>
- <p>Migrate your old tokens to  the new tokens</p>
+              <h2 className="text-xl font-semibold">Migration</h2>
+              <p>Migrate your old tokens to the new tokens</p>
               {/* <div className="flex justify-center w-full">
                 <p className="text-black text-md">
                   <span className="text-2xl">

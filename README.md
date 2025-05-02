@@ -1,7 +1,3 @@
-# Zend - Token Migration dApp
-
-Zend is a decentralized application (dApp) built on Next.js that facilitates the migration of tokens from an old contract to a new one. This migration platform provides a user-friendly interface for both token holders and administrators.
-
 ## Features
 
 - **Token Migration**: Users can migrate their old tokens to the new token contract
