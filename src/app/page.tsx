@@ -208,7 +208,9 @@ export default function Home() {
               />
             </div> */}
 
-              <div className="flex justify-center w-full">
+ <h2 className="text-xl font-semibold">Migration</h2>
+ <p>Migrate your old tokens to  the new tokens</p>
+              {/* <div className="flex justify-center w-full">
                 <p className="text-black text-md">
                   <span className="text-2xl">
                     {countdown.days.toString().padStart(2, "0")}
@@ -227,7 +229,7 @@ export default function Home() {
                   </span>
                   s
                 </p>
-              </div>
+              </div> */}
 
               <button
                 onClick={isConnected ? () => handleMigrate() : () => open()}
