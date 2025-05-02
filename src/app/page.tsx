@@ -24,10 +24,8 @@ export default function Home() {
     owner,
     isReadingContracts,
     isPending,
-    error,
     remainingTime,
     remainingTimeError,
-    writingError,
     writeContract,
   } = useMigrationContract();
 

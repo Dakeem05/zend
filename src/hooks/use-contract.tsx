@@ -5,8 +5,10 @@ import {
   useWriteContract,
 } from "wagmi";
 import { contractABI } from "@/ABI/migrationABI";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
-const TOKEN_ADDRESS = "0xEB039EF227Da932A1bA95B9C964300eEaa280131";
+const TOKEN_ADDRESS = "0xfF7473a087F8F9C5DDfaA43DC253f5b4FA0Bd252";
 
 export const useMigrationContract = () => {
   const {
@@ -31,7 +33,7 @@ export const useMigrationContract = () => {
   const isReadingContracts = readingOwner || readingTime;
   const {
     data: writeContractResult,
-    writeContract: writeContractFunc,
+    writeContractAsync: writeContractFunc,
     error: writingError,
     isPending,
   } = useWriteContract();
@@ -41,6 +43,7 @@ export const useMigrationContract = () => {
     isSuccess: isConfirmed,
   } = useWaitForTransactionReceipt({
     hash: writeContractResult,
+    query: { enabled: !!writeContractResult },
   });
 
   const writeContract = ({
@@ -50,13 +53,44 @@ export const useMigrationContract = () => {
     args?: unknown[];
     functionName: string;
   }) => {
-    writeContractFunc({
-      abi: contractABI,
-      args,
-      functionName,
-      address: TOKEN_ADDRESS,
-    });
+    try {
+      const tx = writeContractFunc({
+        abi: contractABI,
+        args,
+        functionName,
+        address: TOKEN_ADDRESS,
+      });
+
+      toast.promise(tx, {
+        loading: "Transaction submitted...",
+        success: "Transaction confirmed!",
+        error: "Transaction failed.",
+      });
+    } catch (err: unknown) {
+      toast.error(
+        `Write failed: ${
+          (err as { message: string })?.message || "Unknown error"
+        }`
+      );
+      console.error(err);
+    }
   };
+
+  useEffect(() => {
+    if (error) toast.error("Failed to fetch contract owner.");
+  }, [error]);
+
+  useEffect(() => {
+    if (remainingTimeError) toast.error("Failed to fetch remaining time.");
+  }, [remainingTimeError]);
+
+  useEffect(() => {
+    if (isConfirmed) {
+      toast.success("Transaction successfully confirmed!");
+    } else if (writingError) {
+      toast.error("Transaction failed.");
+    }
+  }, [isConfirmed, writingError]);
 
   return {
     owner,
