@@ -148,7 +148,7 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => open()}
-            className="bg-blue-900 text-white px-6 py-2 rounded-full font-bold"
+            className="bg-black text-white px-6 py-2 rounded-full font-bold"
           >
             {isConnected
               ? address?.slice(0, 4) + "...." + address?.slice(-4)
@@ -208,8 +208,10 @@ export default function Home() {
               />
             </div> */}
 
-              <h2 className="text-xl font-semibold">Migration</h2>
-              <p>Migrate your old tokens to the new tokens</p>
+              <h2 className="text-2xl font-semibold">Migration</h2>
+              <p className="font-medium">
+                Migrate your old tokens to the new tokens
+              </p>
               {/* <div className="flex justify-center w-full">
                 <p className="text-black text-md">
                   <span className="text-2xl">
