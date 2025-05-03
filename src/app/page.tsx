@@ -196,7 +196,7 @@ export default function Home() {
               <Loader className="w-5 h-5 animate-spin text-black" />
             </div>
           ) : tab == "migrate" ? (
-            <div className="space-y-6">
+            <div className="space-y-6 text-black">
               {/* <div>
               <label className="block text-gray-600 mb-2">
                 Recipient&apos;s email address.
