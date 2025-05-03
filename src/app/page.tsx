@@ -27,7 +27,7 @@ export default function Home() {
     isReadingContracts,
     isPending,
     remainingTime,
-    remainingTimeError,
+    // remainingTimeError,
     writeContract,
     isPaused,
   } = useMigrationContract();
@@ -61,7 +61,7 @@ export default function Home() {
     };
   };
 
-  const [countdown, setCountdown] = useState(
+  const [, setCountdown] = useState(
     formatRemainingTime(Number(remainingTime) || 0)
   );
 
@@ -254,7 +254,7 @@ export default function Home() {
               </div> */}
 
               <button
-              disabled={isPending}
+                disabled={isPending}
                 onClick={isConnected ? () => handleMigrate() : () => open()}
                 className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
               >
@@ -264,7 +264,7 @@ export default function Home() {
           ) : (
             <div className="flex flex-col gap-6">
               <button
-              disabled={isPending}
+                disabled={isPending}
                 onClick={handleSetPaused}
                 className="w-full bg-black text-white py-2 rounded-lg font-medium mt-6"
               >
@@ -297,7 +297,7 @@ export default function Home() {
                   />
                 </div>
                 <button
-                disabled={isPending}
+                  disabled={isPending}
                   onClick={fundWallet}
                   className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
                 >
@@ -329,7 +329,7 @@ export default function Home() {
                   />
                 </div>
                 <button
-                disabled={isPending}
+                  disabled={isPending}
                   onClick={handleExtendDays}
                   className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
                 >
@@ -360,7 +360,7 @@ export default function Home() {
                   />
                 </div>
                 <button
-                disabled={isPending}
+                  disabled={isPending}
                   onClick={handleSetNewAdmin}
                   className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
                 >
@@ -378,7 +378,7 @@ export default function Home() {
                 </label>
 
                 <button
-                disabled={isPending}
+                  disabled={isPending}
                   onClick={handleWithdraw}
                   className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
                 >
