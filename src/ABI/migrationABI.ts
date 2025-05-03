@@ -15,11 +15,7 @@ export const contractABI = [
   { inputs: [], name: "Migration__AlreadyMigrated", type: "error" },
   { inputs: [], name: "Migration__Ended", type: "error" },
   { inputs: [], name: "Migration__FailedToBurnOldTokens", type: "error" },
-  {
-    inputs: [],
-    name: "Migration__FailedToTransferNewTokens",
-    type: "error",
-  },
+  { inputs: [], name: "Migration__FailedToTransferNewTokens", type: "error" },
   { inputs: [], name: "Migration__FailedToWithdrawFunds", type: "error" },
   { inputs: [], name: "Migration__InvalidAmount", type: "error" },
   { inputs: [], name: "Migration__NotAnOldTokenHolder", type: "error" },
@@ -41,12 +37,7 @@ export const contractABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
+      { indexed: true, internalType: "address", name: "user", type: "address" },
       {
         indexed: false,
         internalType: "uint256",
@@ -79,12 +70,7 @@ export const contractABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "paused",
-        type: "bool",
-      },
+      { indexed: false, internalType: "bool", name: "paused", type: "bool" },
     ],
     name: "MigrationPaused",
     type: "event",
@@ -111,12 +97,7 @@ export const contractABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
+      { indexed: true, internalType: "address", name: "user", type: "address" },
       {
         indexed: false,
         internalType: "uint256",
@@ -141,6 +122,13 @@ export const contractABI = [
     name: "fundNewTokens",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getPaused",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -172,7 +160,7 @@ export const contractABI = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "bool", name: "paused", type: "bool" }],
+    inputs: [],
     name: "setPaused",
     outputs: [],
     stateMutability: "nonpayable",

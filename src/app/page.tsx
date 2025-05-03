@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { Loader } from "lucide-react";
 import { useMigrationContract } from "@/hooks/use-contract";
+import { toast } from "sonner";
 
 export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [fundAmount, setFundAmount] = useState<number | undefined>();
   const [extendDays, setExtendDays] = useState<number | undefined>();
+  const [newAdminWallet, setNewAdminWallet] = useState<string | undefined>();
   const [tab, setTab] = useState("migrate");
 
   const handleTabChange = (newTab: string) => {
@@ -27,6 +29,7 @@ export default function Home() {
     remainingTime,
     remainingTimeError,
     writeContract,
+    isPaused,
   } = useMigrationContract();
 
   useEffect(() => {
@@ -118,20 +121,37 @@ export default function Home() {
   };
 
   const handleMigrate = () => {
-    console.log("called migrate");
     writeContract({
       functionName: "migrate",
     });
   };
-  console.log(
-    "looking for me?",
-    isReadingContracts,
-    formatRemainingTime(Number(remainingTime)),
-    remainingTime,
-    remainingTimeError,
-    owner,
-    countdown
-  );
+
+  const handleWithdraw = () => {
+    writeContract({
+      functionName: "withdraw",
+    });
+  };
+
+  const handleSetNewAdmin = () => {
+    if (!newAdminWallet) return;
+    const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+    if (!ethereumAddressRegex.test(newAdminWallet)) {
+      toast("Invalid Ethereum wallet address");
+      return;
+    }
+    writeContract({
+      functionName: "transferOwnership",
+      args: [newAdminWallet],
+    });
+  };
+
+  const handleSetPaused = () => {
+    writeContract({
+      functionName: "setPaused",
+    });
+  };
+
+  // console.log("looking for me?", isPaused);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-white to-slate-50">
@@ -234,6 +254,7 @@ export default function Home() {
               </div> */}
 
               <button
+              disabled={isPending}
                 onClick={isConnected ? () => handleMigrate() : () => open()}
                 className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
               >
@@ -242,6 +263,19 @@ export default function Home() {
             </div>
           ) : (
             <div className="flex flex-col gap-6">
+              <button
+              disabled={isPending}
+                onClick={handleSetPaused}
+                className="w-full bg-black text-white py-2 rounded-lg font-medium mt-6"
+              >
+                {isPending
+                  ? "Pending"
+                  : isConnected
+                  ? isPaused
+                    ? "Continue Migration"
+                    : "Pause Migration"
+                  : "Connect Wallet"}
+              </button>
               <div className="border-b pb-2">
                 <h2 className="text-xl font-bold text-black">Fund</h2>
                 <label className="block text-gray-600 mb-2">
@@ -263,6 +297,7 @@ export default function Home() {
                   />
                 </div>
                 <button
+                disabled={isPending}
                   onClick={fundWallet}
                   className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
                 >
@@ -294,6 +329,7 @@ export default function Home() {
                   />
                 </div>
                 <button
+                disabled={isPending}
                   onClick={handleExtendDays}
                   className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
                 >
@@ -301,6 +337,55 @@ export default function Home() {
                     ? "Pending"
                     : isConnected
                     ? "Extend"
+                    : "Connect Wallet"}
+                </button>
+              </div>
+              <div className="">
+                <h2 className="text-xl font-bold text-black">
+                  Transfer Ownership
+                </h2>
+                <label className="block text-gray-600 mb-2">
+                  Transfer Admin rights to a new wallet address
+                </label>
+                <div className="flex items-center border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-center">
+                    {/* <span className="font-medium">Base USDC</span> */}
+                  </div>
+                  <input
+                    value={newAdminWallet}
+                    onChange={(e) => setNewAdminWallet(e.target.value)}
+                    type="text"
+                    className="flex-1 outline-none "
+                    placeholder=""
+                  />
+                </div>
+                <button
+                disabled={isPending}
+                  onClick={handleSetNewAdmin}
+                  className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
+                >
+                  {isPending
+                    ? "Pending"
+                    : isConnected
+                    ? "Change Admin"
+                    : "Connect Wallet"}
+                </button>
+              </div>
+              <div className="">
+                <h2 className="text-xl font-bold text-black">Withdraw</h2>
+                <label className="block text-gray-600 mb-2">
+                  Withdraw tokens to your wallet
+                </label>
+
+                <button
+                disabled={isPending}
+                  onClick={handleWithdraw}
+                  className="w-full bg-black text-white py-4 rounded-lg font-medium mt-6"
+                >
+                  {isPending
+                    ? "Pending"
+                    : isConnected
+                    ? "Withdraw"
                     : "Connect Wallet"}
                 </button>
               </div>

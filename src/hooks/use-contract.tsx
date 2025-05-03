@@ -8,7 +8,7 @@ import { contractABI } from "@/ABI/migrationABI";
 import { toast } from "sonner";
 import { useEffect } from "react";
 
-const TOKEN_ADDRESS = "0xfF7473a087F8F9C5DDfaA43DC253f5b4FA0Bd252";
+const TOKEN_ADDRESS = "0x6d995a435df148eaf0cf735d5975c0ee22294e7a";
 
 export const useMigrationContract = () => {
   const {
@@ -20,6 +20,7 @@ export const useMigrationContract = () => {
     address: TOKEN_ADDRESS,
     abi: contractABI,
   });
+
   const {
     data: remainingTime,
     isPending: readingTime,
@@ -30,7 +31,17 @@ export const useMigrationContract = () => {
     abi: contractABI,
   });
 
-  const isReadingContracts = readingOwner || readingTime;
+  const {
+    data: isPaused,
+    isPending: readingIfPaused,
+    error: isPausedError,
+  } = useReadContract({
+    functionName: "getPaused",
+    address: TOKEN_ADDRESS,
+    abi: contractABI,
+  });
+
+  const isReadingContracts = readingOwner || readingTime || readingIfPaused;
   const {
     data: writeContractResult,
     writeContractAsync: writeContractFunc,
@@ -96,6 +107,8 @@ export const useMigrationContract = () => {
     owner,
     isReadingContracts,
     remainingTime,
+    isPaused,
+    isPausedError,
     remainingTimeError,
     error,
     isPending,
